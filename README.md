@@ -7,8 +7,8 @@ Section 19 covered:
 - [x] Types of Errors & Error Handling
 - [x] Analyzing the Error Handling in the Current Project
 - [x] Errors - Some Theory
-- [ ] Throwing Errors in Code
-- [ ] Returning Error Pages
+- [x] Throwing Errors in Code
+- [x] Returning Error Pages
 - [ ] Using the Express.js Error Handling Middleware
 - [ ] Updating the App
 - [ ] Using the Error Handling Middleware Correctly

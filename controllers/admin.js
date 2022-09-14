@@ -1,3 +1,5 @@
+const mongoose = require("mongoose");
+
 const { validationResult } = require("express-validator");
 
 const Product = require("../models/product");
@@ -41,6 +43,7 @@ exports.postAddProduct = (req, res, next) => {
   }
 
   const product = new Product({
+    _id: new mongoose.Types.ObjectId("630baa5715e38a1befaa4384"),
     title: title,
     price: price,
     description: description,
@@ -58,7 +61,24 @@ exports.postAddProduct = (req, res, next) => {
     })
     .catch((err) => {
       // And mongoose also gives us a catch method we can call
-      console.log(err);
+
+      // We could return a 500 response and render the page again with a error message:
+      // return res.status(500).render("admin/edit-product", {
+      //   path: "/admin/add-product",
+      //   pageTitle: "Add Product",
+      //   editing: false,
+      //   oldInput: {
+      //     title: title,
+      //     imageUrl: imageUrl,
+      //     price: price,
+      //     description: description,
+      //   },
+      //   errorMessage: "Database operation failed, please try again.",
+      //   validationErrors: [],
+      // });
+
+      // We could also redirect like this to a 500 page:
+      res.redirect("/500");
     });
 };
 
@@ -107,7 +127,7 @@ exports.postEditProduct = (req, res, next) => {
         imageUrl: updatedImageUrl,
         price: updatedPrice,
         description: updatedDesc,
-        _id: prodId
+        _id: prodId,
       },
       errorMessage: errors.array()[0].msg,
       validationErrors: errors.array(),
