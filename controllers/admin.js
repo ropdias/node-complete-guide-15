@@ -78,7 +78,13 @@ exports.postAddProduct = (req, res, next) => {
       // });
 
       // We could also redirect like this to a 500 page:
-      res.redirect("/500");
+      // res.redirect("/500");
+
+      // But we actually should create a new Error and pass it to next() to let Express know that
+      // an error occurred and skip all other middlewares and move right away to an error handling middleware we can define:
+      const error = new Error(err);
+      error.httpStatusCode = 500; // You can add extra information with the error object so that you can use it in the central error middleware
+      return next(error);
     });
 };
 
@@ -106,7 +112,11 @@ exports.getEditProduct = (req, res, next) => {
         validationErrors: [],
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
 exports.postEditProduct = (req, res, next) => {

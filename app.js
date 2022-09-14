@@ -82,6 +82,15 @@ app.get("/500", errorControler.get500);
 
 app.use(errorControler.get404);
 
+// Normally this middleware wouldn't be reached because we have or "catch all middleware" errorControler.get404
+// But there is the special type of middleware called "error handling middleware" with 4 arguments that Express will
+// move right away to it when you can next() with an Error inside:
+app.use((error, req, res, next) => {
+  res.redirect("/500");
+  // We can also render a page here or return some JSON data here
+  // res.status(error.httpStatusCode).render(...);
+});
+
 mongoose
   .connect(process.env.MONGODB_URI)
   .then((result) => {
