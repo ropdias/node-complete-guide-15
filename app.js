@@ -49,6 +49,13 @@ app.use(
 app.use(csrfProtection);
 app.use(flash());
 
+// We can use res.locals here to add "isAuthenticated" and "csrfToken" to every view:
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  res.locals.csrfToken = req.csrfToken(); // we are getting this method that is provided from the csrf middleware
+  next();
+});
+
 // You need this middleware to get the full mongoose model so we can call all methods directly on that user for this request:
 app.use((req, res, next) => {
   if (!req.session.user) {
@@ -63,15 +70,12 @@ app.use((req, res, next) => {
       next();
     })
     .catch((err) => {
-      throw new Error(err);
+       // If you throw an Error here you will not reach the express error handling middleware
+       // Because this is ASYNC code and you need to use next(new Error(err)) instead.
+       // Throwing an error will only reach the express error handling middleware in SYNC code
+       // throw new Error(err);
+      next(new Error(err));
     });
-});
-
-// We can use res.locals here to add "isAuthenticated" and "csrfToken" to every view:
-app.use((req, res, next) => {
-  res.locals.isAuthenticated = req.session.isLoggedIn;
-  res.locals.csrfToken = req.csrfToken(); // we are getting this method that is provided from the csrf middleware
-  next();
 });
 
 app.use("/admin", adminRoutes);
@@ -86,9 +90,15 @@ app.use(errorControler.get404);
 // But there is the special type of middleware called "error handling middleware" with 4 arguments that Express will
 // move right away to it when you can next() with an Error inside:
 app.use((error, req, res, next) => {
-  res.redirect("/500");
+  // res.redirect("/500"); // This can lead to infinite loop if you thrown an Error in SYNC code
   // We can also render a page here or return some JSON data here
   // res.status(error.httpStatusCode).render(...);
+  res
+    .status(500)
+    .render("500", {
+      pageTitle: "Error!",
+      path: "/500",
+    });
 });
 
 mongoose

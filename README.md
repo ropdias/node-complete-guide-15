@@ -11,7 +11,7 @@ Section 19 covered:
 - [x] Returning Error Pages
 - [x] Using the Express.js Error Handling Middleware
 - [x] Updating the App
-- [ ] Using the Error Handling Middleware Correctly
+- [x] Using the Error Handling Middleware Correctly
 - [ ] Status Codes
 
 
