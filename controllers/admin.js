@@ -43,7 +43,7 @@ exports.postAddProduct = (req, res, next) => {
   }
 
   const product = new Product({
-    _id: new mongoose.Types.ObjectId("630baa5715e38a1befaa4384"),
+    // _id: new mongoose.Types.ObjectId("630baa5715e38a1befaa4384"), // This is just to test the error in the catch() block
     title: title,
     price: price,
     description: description,
@@ -155,13 +155,21 @@ exports.postEditProduct = (req, res, next) => {
       product.imageUrl = updatedImageUrl;
       return product
         .save() // if we use the save() here it will not create a new one instead it will update behind the scenes
-        .then(() => {
+        .then(() => { // We have this then() here and not in a chain because we have different returns for different situations
           console.log("UPDATED PRODUCT!");
           res.redirect("/admin/products");
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          const error = new Error(err);
+          error.httpStatusCode = 500;
+          return next(error);
+        });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
 exports.getProducts = (req, res, next) => {
@@ -175,7 +183,11 @@ exports.getProducts = (req, res, next) => {
         path: "/admin/products",
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
 exports.postDeleteProduct = (req, res, next) => {
@@ -189,5 +201,9 @@ exports.postDeleteProduct = (req, res, next) => {
       }
       res.redirect("/admin/products");
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
