@@ -12,7 +12,7 @@ Section 19 covered:
 - [x] Using the Express.js Error Handling Middleware
 - [x] Updating the App
 - [x] Using the Error Handling Middleware Correctly
-- [ ] Status Codes
+- [x] Status Codes
 
 
 
