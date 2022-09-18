@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const { validationResult } = require("express-validator");
 
 const Product = require("../models/product");
+const User = require("../models/user");
 
 exports.getAddProduct = (req, res, next) => {
   res.render("admin/edit-product", {
@@ -155,7 +156,8 @@ exports.postEditProduct = (req, res, next) => {
       product.imageUrl = updatedImageUrl;
       return product
         .save() // if we use the save() here it will not create a new one instead it will update behind the scenes
-        .then(() => { // We have this then() here and not in a chain because we have different returns for different situations
+        .then(() => {
+          // We have this then() here and not in a chain because we have different returns for different situations
           console.log("UPDATED PRODUCT!");
           res.redirect("/admin/products");
         })
@@ -193,11 +195,23 @@ exports.getProducts = (req, res, next) => {
 exports.postDeleteProduct = (req, res, next) => {
   // Fetch information from the product
   const prodId = req.body.productId;
-  // It's not removing from every cart yet !
   Product.deleteOne({ _id: prodId, userId: req.user._id })
     .then((result) => {
       if (result.deletedCount > 0) {
-        console.log("Deleted product and removed it from every cart !"); // It's not removing from every cart yet !
+        console.log(
+          `Deleted product ! (Total deleted: ${result.deletedCount})`
+        );
+      }
+      return User.updateMany(
+        {},
+        { $pull: { "cart.items": { productId: prodId } } }
+      );
+    })
+    .then((result) => {
+      if (result.modifiedCount > 0) {
+        console.log(
+          `Removed product from every cart ! (Total modified: ${result.modifiedCount})`
+        );
       }
       res.redirect("/admin/products");
     })
